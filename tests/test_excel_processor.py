@@ -4,46 +4,35 @@ This module tests the core Excel processing functionality using simple
 test cases with pre-created Excel files.
 """
 
-import tempfile
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
+# from pathlib import Path
 from xlsx_reader.excel_processor import get_sheet_names, get_sheet_row_count, process_excel_file
 
 
-def create_test_excel(file_path: str) -> None:
+def create_test_excel(file_path: Path) -> None:
     """Create a simple test Excel file with multiple sheets."""
     with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
-        # Sheet 1: 10 rows
         df1 = pd.DataFrame({"A": range(1, 11), "B": [f"Row {i}" for i in range(1, 11)]})
         df1.to_excel(writer, sheet_name="Sheet1", index=False)
 
-        # Sheet 2: 5 rows
         df2 = pd.DataFrame({"X": range(1, 6), "Y": [f"Data {i}" for i in range(1, 6)]})
         df2.to_excel(writer, sheet_name="Sheet2", index=False)
 
-        # Sheet 3: Empty (0 rows)
         df3 = pd.DataFrame(columns=["Col1", "Col2"])
         df3.to_excel(writer, sheet_name="EmptySheet", index=False)
 
 
 class TestExcelProcessor:
-    """Test cases for Excel processing functions."""
-
     @pytest.fixture
-    def test_excel_file(self):
-        """Create a temporary Excel file for testing."""
-        tmp = tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False)
-        tmp_path = Path(tmp.name)
-        try:
-            tmp.close()
-            create_test_excel(str(tmp_path))
-            yield str(tmp_path)
-        finally:
-            if tmp_path.exists():
-                tmp_path.unlink()
+    def test_excel_file(self, tmp_path: Path):
+        """Create an Excel file in pytest's temp directory."""
+        file_path = tmp_path / "test.xlsx"
+        create_test_excel(file_path)
+        return str(file_path)  # just return path, no manual unlink
 
     def test_get_sheet_names(self, test_excel_file):
         """Test getting sheet names from Excel file."""

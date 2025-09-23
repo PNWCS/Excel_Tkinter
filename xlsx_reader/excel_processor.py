@@ -23,7 +23,10 @@ def get_sheet_names(file_path: str) -> list[str]:
         sheet names in the Excel file. Use pandas.ExcelFile to read
         the sheet names without loading all data.
     """
-    raise NotImplementedError
+    excel_file = pd.ExcelFile(file_path)
+    sheet_name = excel_file.sheet_names
+    return sheet_name
+    # raise NotImplementedError
 
 
 def get_sheet_row_count(file_path: str, sheet_name: str) -> int:
@@ -41,7 +44,10 @@ def get_sheet_row_count(file_path: str, sheet_name: str) -> int:
         rows in the specified sheet. Use pandas.read_excel() to read
         the sheet and return len(dataframe).
     """
-    raise NotImplementedError
+    excel_file = pd.read_excel(file_path, sheet_name)
+    row_no = excel_file.shape[0]
+    return row_no
+    # raise NotImplementedError
 
 
 def process_excel_file(
